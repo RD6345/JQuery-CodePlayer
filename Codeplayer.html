@@ -1,0 +1,172 @@
+<!Doctype html>
+<html>
+<head>
+  <title>Jquery CodePlayer</title>
+  <script type="text/javaScript" src="jquery.min.js"> </script>
+  <script src="jquery-ui/jquery-ui.js"></script>
+  <link href="jquery-ui/jquery-ui.css" rel="stylesheet">
+
+
+<style type ="text/css">
+body {
+  font-family: sans-serif;
+  padding: 0;
+  margin: 0;
+}
+
+#header {
+  width: 100%;
+  background-color: #EEEEEE;
+  padding: 5px;
+  height: 30px;
+}
+
+#logo {
+  float: left;
+  font-weight: bold;
+  font-size: 120%;
+  padding: 3px 5px;
+}
+
+#buttonContainer {
+  width: 233px;
+  margin: 0 auto;
+  }
+
+  .toggleButton {
+    float: left;
+    border: 1px solid grey;
+    padding: 6px;
+    border-right: none;
+    font-size: 90%;
+  }
+
+  #html {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+
+  #output {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-right: 1px solid grey;
+  }
+
+  .active {
+    background-color: #E8F2FF;
+
+  }
+
+  .highlightedButton {
+    background-color: grey;
+  }
+
+  textarea {
+    height: 100%;
+    resize: none;
+    border-top: none;
+    border-color: grey;
+  }
+  .panel {
+    float: left;
+    width: 50%;
+    border-left: none;
+  }
+
+  iframe {
+    border: none;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+
+
+</style>
+</head>
+
+<body>
+<div id="header">
+  <div id="logo">CodePlayer </div>
+
+    <!--Divs used below for buttons as easier to style-->
+    <div id="buttonContainer">
+      <div class="toggleButton active" id="html">HTML</div>
+      <div class="toggleButton" id="css">CSS</div>
+      <div class="toggleButton" id="javascript">JavaScript</div>
+      <div class="toggleButton active" id="output">Output</div>
+
+  </div>
+</div>
+
+<div id="bodyContainer">
+  <textarea id="htmlPanel" class = "panel"><p id="paragraph">Hello World!</p></textarea>
+  <textarea id="cssPanel" class = "panel hidden">p { color: blue;}</textarea>
+  <textarea id="javascriptPanel" class = "panel hidden">document.getElementById("paragraph").innerHTML = "Hello Roy!"</textarea>
+  <iframe id="outputPanel" class = "panel"></iframe>
+
+</div>
+
+<script type="text/javascript">
+
+      function updateOutput () {
+        $("iframe").contents().find("html").html("<html><head><style type='text/css'>" +
+        $("#cssPanel").val() + "</style></head><body>" + $("#htmlPanel").val() + "</body></html>");
+        //$("iframe").contents().find("html").html($("#htmlPanel").val()); copies the htmlPanel content into into the iframe.
+
+              document.getElementById("outputPanel").contentWindow.eval($("#javascriptPanel").val());
+        //eval() evaluates or executes an argument. So above - execute the contents of #javascriptPanel.
+        //using contentWindow allows the content to be evaluated within the iframe.
+
+      };
+
+      $(".toggleButton").hover(function() {
+        $(this).addClass("highlightedButton");
+      }, function() {
+        $(this).removeClass("highlightedButton");
+      });
+
+        $(".toggleButton").click(function() {
+            $(this).toggleClass("active");
+
+            $(this).removeClass("highlightedButton");
+            //below - obtaining the id of button that was clicked.
+            var panelId = $(this).attr("id") + "Panel";
+            //panelID - id of the panel I'm showing and hiding.
+            $("#" + panelId).toggleClass("hidden");
+            /* Could use toggle () which just displays or hides an element.
+            toggle() more efficient - but toggleClass allows us to count the
+            elements in the class to help with the panel positioning (width).
+                                                            */
+
+            var numberOfActivePanels = 4 - $(".hidden").length;
+
+            $(".panel").width(($(window).width() / numberOfActivePanels) - 10);
+            /* How many panels are being displayed?
+               Count number of hidden elements - then subtract from 4
+               to determin how many windows are open thus how many to divide by.
+
+               */
+
+        });
+
+$(".panel").height($(window).height() - $("#header").height() - 15);//changes panel height.
+$(".panel").width(($(window).width() / 2) - 10);//changes the panel width.
+
+            updateOutput ();
+
+
+
+$("textarea").on('change keyup paste', function() { //allows real-time updating of the iframe.
+updateOutput ();
+});
+// above: manually putting in the html page to insert the CSS and JavaScript.
+
+
+
+</script>
+
+</body>
+
+</html>
